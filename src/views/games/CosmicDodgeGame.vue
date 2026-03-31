@@ -41,7 +41,7 @@ import { useGameCanvas } from '@/composables/useGameCanvas.js'
 const gameStore = useGameStore()
 const canvasRef = ref(null)
 
-const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 1.25, minSize: 280, maxSize: 700 })
+const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 0.75, minSize: 280, maxSize: 700 })
 
 const time = ref(0)
 const combo = ref(1)

@@ -48,7 +48,7 @@ const COLS = 20, ROWS = 20
 let CELL = 20
 const SPEED = 120
 
-const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 1, minSize: 280, maxSize: 600 })
+const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 0.6, minSize: 280, maxSize: 600 })
 
 const score = ref(0)
 const running = ref(false)

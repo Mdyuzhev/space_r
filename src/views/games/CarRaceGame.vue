@@ -37,7 +37,7 @@ import GameDpad from '@/components/GameDpad.vue'
 const gameStore = useGameStore()
 const canvasRef = ref(null)
 
-const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 1.67, minSize: 240, maxSize: 450 })
+const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 1.0, minSize: 240, maxSize: 450 })
 
 const score = ref(0)
 const running = ref(false)
