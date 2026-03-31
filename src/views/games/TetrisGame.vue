@@ -55,7 +55,7 @@ const COLS = 10
 const ROWS = 20
 let CELL = 30
 
-const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 1.2, minSize: 280, maxSize: 500 })
+const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 2, minSize: 200, maxSize: 360 })
 
 const score = ref(0)
 const level = ref(1)
