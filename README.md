@@ -26,7 +26,7 @@
 ## Запуск
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/space_r.git
+git clone https://github.com/Mdyuzhev/space_r.git
 cd space_r
 npm install
 npm run dev       # http://localhost:5173/space_r/
