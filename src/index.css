@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { @apply bg-slate-950 text-slate-100 scroll-smooth; }
+  * { @apply box-border; }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-slate-800/60 backdrop-blur-md border border-slate-700/50 rounded-2xl;
+  }
+  .neon-text-cyan {
+    text-shadow: 0 0 10px #22d3ee80, 0 0 30px #22d3ee40;
+  }
+  .neon-text-purple {
+    text-shadow: 0 0 10px #a855f780, 0 0 30px #a855f740;
+  }
+  .btn-primary {
+    @apply px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/40;
+  }
+  .btn-secondary {
+    @apply px-6 py-3 border border-slate-600 hover:border-purple-500 text-slate-300 hover:text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105;
+  }
+}

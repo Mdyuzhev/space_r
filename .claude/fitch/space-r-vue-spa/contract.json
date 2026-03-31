@@ -1,0 +1,278 @@
+{
+  "meta": {
+    "id": "fitch-space-r-vue-spa",
+    "feature": "Форк Space_roblox + переработка в Vue 3 SPA — персонажи, мини-игры, факты, воркшоп",
+    "project": "space_r",
+    "project_path": "E:\\Politech\\space_r",
+    "source_repo": "https://github.com/MMDyuzhev/Space_roblox",
+    "source_pages": "https://mmdyuzhev.github.io/Space_roblox/",
+    "reference_project": "E:\\Politech\\lab-ecosystem",
+    "created_at": "2026-03-31T10:00:00Z",
+    "schema_version": "1.0",
+    "status": "done",
+    "participants": {
+      "analyst":   "done",
+      "designer":  "done",
+      "tech_lead": "done",
+      "toster":    "done",
+      "devops":    "done"
+    },
+    "affected_areas": [
+      "project-setup",
+      "routing",
+      "characters",
+      "games",
+      "facts",
+      "workshop",
+      "math-quiz",
+      "music-player",
+      "deploy"
+    ]
+  },
+
+  "analyst": {
+    "status": "done",
+    "summary": "Форк студенческого проекта Space_roblox (3 файла, 5 персонажей, 6 игр) в полноценное Vue 3 SPA уровня lab-ecosystem. 15 требований, 10 критериев приёмки.",
+    "source_analysis": {
+      "original_files": ["index.html", "script.js", "style.css"],
+      "original_assets": ["images/robot_assistant.png", "images/mexa.png", "images/cap_racketa.png", "audio/"],
+      "original_features": ["5 персонажей", "Космические факты (20)", "Рисовалка", "Мат. викторина", "Тетрис", "Змейка", "Гонка машин", "Понг", "Кликер", "Космическое уклонение"],
+      "original_problems": ["Всё в одном файле", "Глобальные переменные", "Нет роутинга", "Модальные окна через display:none", "Нет state management"]
+    },
+    "requirements": [
+      { "id": "R01", "title": "Форк и ассеты", "description": "Форкнуть репозиторий, скопировать images/ и audio/ в public/assets/", "type": "functional", "priority": "must" },
+      { "id": "R02", "title": "Vue 3 SPA scaffold", "description": "Vite + Vue 3 + Vue Router 4 + Pinia + Tailwind CSS + @vueuse/motion", "type": "technical", "priority": "must" },
+      { "id": "R03", "title": "Home page", "description": "Hero-секция с анимацией + превью персонажей + превью игр + call-to-action", "type": "functional", "priority": "must" },
+      { "id": "R04", "title": "Characters page", "description": "Все 5 персонажей: карточки с фото/emoji, статы (опыт, миссии, ранг), способность, hover-эффект", "type": "functional", "priority": "must" },
+      { "id": "R05", "title": "Games Hub", "description": "Страница со всеми 6 играми в виде карточек, переход в игру по клику", "type": "functional", "priority": "must" },
+      { "id": "R06", "title": "Все 6 игр", "description": "Полностью играбельные: Тетрис, Змейка, Гонка Машин, Понг, Кликер, Космическое Уклонение", "type": "functional", "priority": "must" },
+      { "id": "R07", "title": "Cosmic Facts", "description": "Страница с 20 фактами, пагинация, красивые карточки", "type": "functional", "priority": "must" },
+      { "id": "R08", "title": "Workshop", "description": "Воркшоп Инженера Гайки: canvas рисовалка с инструментами (ластик, цвет, размер, сохранение)", "type": "functional", "priority": "should" },
+      { "id": "R09", "title": "Math Quiz", "description": "Мат. викторина — модальное окно или страница, вопросы по умножению, счёт", "type": "functional", "priority": "should" },
+      { "id": "R10", "title": "Navbar", "description": "Sticky navbar с лого, навигацией, активным роутом, бургером на мобиле", "type": "ui", "priority": "must" },
+      { "id": "R11", "title": "Music Player", "description": "Floating кнопка/виджет для включения фоновой музыки (Suno tracks)", "type": "functional", "priority": "should" },
+      { "id": "R12", "title": "Star Background", "description": "Анимированный фон со звёздами (canvas или CSS) на всех страницах", "type": "ui", "priority": "must" },
+      { "id": "R13", "title": "Responsive Design", "description": "Mobile-first, breakpoints: 375px / 768px / 1280px", "type": "ui", "priority": "must" },
+      { "id": "R14", "title": "GitHub Actions Deploy", "description": "Workflow для автодеплоя на GitHub Pages при push в main", "type": "devops", "priority": "must" },
+      { "id": "R15", "title": "README", "description": "README.md с описанием, скриншотом, командами запуска", "type": "docs", "priority": "should" }
+    ],
+    "acceptance_criteria": [
+      "npm run dev запускается без ошибок",
+      "npm run build успешен (нет TypeScript/lint ошибок)",
+      "Все 7 роутов (/,/characters,/games,/games/:id,/facts,/workshop,/quiz) работают без 404",
+      "Все 6 игр запускаются и корректно завершаются",
+      "20 фактов отображаются с навигацией вперёд/назад",
+      "Canvas рисовалка: рисует, ластик, очищает, сохраняет PNG",
+      "Math Quiz: генерирует вопросы, считает правильные/неправильные, показывает итог",
+      "Navbar активный роут подсвечен на всех страницах",
+      "Страница корректно отображается на 375px, 768px, 1280px",
+      "GitHub Pages деплой успешен после push в main"
+    ]
+  },
+
+  "designer": {
+    "status": "done",
+    "summary": "Тёмная космическая тема. Glassmorphism-карточки, анимированные звёзды, neon акценты. Единая дизайн-система на Tailwind.",
+    "palette": {
+      "bg_primary":   "#020617",
+      "bg_secondary": "#0f172a",
+      "accent_cyan":  "#22d3ee",
+      "accent_purple":"#a855f7",
+      "accent_amber": "#fbbf24",
+      "text_primary": "#f1f5f9",
+      "text_muted":   "#94a3b8"
+    },
+    "components": {
+      "StarBackground": "Canvas-анимация: 200 звёзд с twinkle (opacity animation), 5 shooting stars/minute",
+      "AppNavbar": "Sticky, backdrop-blur-md, bg-slate-950/80, лого 🚀 + маршруты + мобильный бургер. Активный роут: text-cyan-400 + underline",
+      "CharacterCard": "bg-slate-800/60 backdrop-blur, border border-slate-700, hover: border-purple-500 glow + scale-105. Фото/emoji сверху, имя, ранг-бейдж, полоски статов, кнопка способности",
+      "GameCard": "bg-slate-800/60 + neon border (цвет по игре), hover: glow-effect. Иконка игры, название, описание, кнопка Играть",
+      "FactCard": "Gradient border (cyan→purple), большой порядковый номер, текст факта, навигация",
+      "PageTransition": "@vueuse/motion: fade + translateY(-10px) → (0) при входе",
+      "MusicPlayer": "Floating виджет bottom-right: круглая кнопка ▶/⏸, glow при воспроизведении"
+    },
+    "pages": {
+      "Home": "Full-screen hero: название + tagline + CTA-кнопки + floating астронавт emoji. Секция персонажей (горизонтальный скролл на мобиле). Секция превью игр (3 карточки)",
+      "Characters": "Grid 3 cols (desktop) / 1 col (mobile). Каждая карточка — кликабельна, раскрывает детали в том же месте",
+      "GamesHub": "Grid 3x2. Каждая карточка ведёт на /games/:id",
+      "Facts": "Центрированная карточка факта, номер X/20, кнопки prev/next, progress bar",
+      "Workshop": "Toolbar сверху (цвет, размер, ластик, очистить, сохранить) + canvas fullwidth",
+      "MathQuiz": "Центрированная карточка: вопрос, 4 варианта ответа, прогресс, счёт"
+    }
+  },
+
+  "tech_lead": {
+    "status": "done",
+    "summary": "14 задач в 6 волнах. Vue 3 + Vite 5 + Vue Router 4 + Pinia + Tailwind CSS 3 + @vueuse/motion. Все игры на Canvas API.",
+    "stack": {
+      "framework": "Vue 3.4 (Composition API + <script setup>)",
+      "bundler": "Vite 5",
+      "router": "Vue Router 4",
+      "state": "Pinia 2",
+      "styling": "Tailwind CSS 3",
+      "animation": "@vueuse/motion",
+      "icons": "lucide-vue-next",
+      "games": "Canvas API (нативный, без библиотек)"
+    },
+    "directory_structure": {
+      "src/": {
+        "assets/": "Статичные ассеты (не публичные)",
+        "components/": "AppNavbar.vue, AppFooter.vue, StarBackground.vue, MusicPlayer.vue, CharacterCard.vue, GameCard.vue, FactCard.vue, Modal.vue",
+        "views/": "HomeView.vue, CharactersView.vue, GamesHubView.vue, FactsView.vue, WorkshopView.vue, MathQuizView.vue",
+        "views/games/": "TetrisGame.vue, SnakeGame.vue, CarRaceGame.vue, PongGame.vue, ClickerGame.vue, CosmicDodgeGame.vue",
+        "stores/": "useGameStore.js, usePlayerStore.js, useMusicStore.js",
+        "data/": "characters.js, facts.js, games.js",
+        "router/": "index.js",
+        "App.vue": "Root + RouterView + StarBackground + MusicPlayer",
+        "main.js": "createApp + router + pinia + motion"
+      },
+      "public/assets/": "images/, audio/"
+    },
+    "routes": [
+      { "path": "/", "component": "HomeView" },
+      { "path": "/characters", "component": "CharactersView" },
+      { "path": "/games", "component": "GamesHubView" },
+      { "path": "/games/tetris", "component": "TetrisGame" },
+      { "path": "/games/snake", "component": "SnakeGame" },
+      { "path": "/games/car-race", "component": "CarRaceGame" },
+      { "path": "/games/pong", "component": "PongGame" },
+      { "path": "/games/clicker", "component": "ClickerGame" },
+      { "path": "/games/cosmic-dodge", "component": "CosmicDodgeGame" },
+      { "path": "/facts", "component": "FactsView" },
+      { "path": "/workshop", "component": "WorkshopView" },
+      { "path": "/quiz", "component": "MathQuizView" }
+    ],
+    "waves": [
+      {
+        "wave": 1,
+        "name": "Project Setup",
+        "parallel": true,
+        "tasks": ["T01", "T02"]
+      },
+      {
+        "wave": 2,
+        "name": "Layout & Shared Components",
+        "parallel": true,
+        "tasks": ["T03", "T04"],
+        "depends_on": ["T01", "T02"]
+      },
+      {
+        "wave": 3,
+        "name": "Core Pages",
+        "parallel": true,
+        "tasks": ["T05", "T06", "T07"],
+        "depends_on": ["T03", "T04"]
+      },
+      {
+        "wave": 4,
+        "name": "Games",
+        "parallel": true,
+        "tasks": ["T08", "T09", "T10"],
+        "depends_on": ["T03"]
+      },
+      {
+        "wave": 5,
+        "name": "Features & Polish",
+        "parallel": true,
+        "tasks": ["T11", "T12", "T13"],
+        "depends_on": ["T03", "T04"]
+      },
+      {
+        "wave": 6,
+        "name": "Deploy & Docs",
+        "parallel": false,
+        "tasks": ["T14"],
+        "depends_on": ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12", "T13"]
+      }
+    ],
+    "all_file_changes": [
+      "package.json", "vite.config.js", "tailwind.config.js", "postcss.config.js", "index.html",
+      "src/main.js", "src/App.vue", "src/index.css",
+      "src/router/index.js",
+      "src/stores/useGameStore.js", "src/stores/usePlayerStore.js", "src/stores/useMusicStore.js",
+      "src/data/characters.js", "src/data/facts.js", "src/data/games.js",
+      "src/components/AppNavbar.vue", "src/components/AppFooter.vue",
+      "src/components/StarBackground.vue", "src/components/MusicPlayer.vue",
+      "src/components/CharacterCard.vue", "src/components/GameCard.vue",
+      "src/components/FactCard.vue", "src/components/Modal.vue",
+      "src/views/HomeView.vue", "src/views/CharactersView.vue",
+      "src/views/GamesHubView.vue", "src/views/FactsView.vue",
+      "src/views/WorkshopView.vue", "src/views/MathQuizView.vue",
+      "src/views/games/TetrisGame.vue", "src/views/games/SnakeGame.vue",
+      "src/views/games/CarRaceGame.vue", "src/views/games/PongGame.vue",
+      "src/views/games/ClickerGame.vue", "src/views/games/CosmicDodgeGame.vue",
+      "public/assets/images/", "public/assets/audio/",
+      ".github/workflows/deploy.yml", "README.md"
+    ],
+    "merge_strategy": {
+      "approach": "single-branch",
+      "git_commands": [
+        "cd E:\\Politech\\space_r",
+        "git init",
+        "git add .",
+        "git commit -m 'feat: initial Vue 3 SPA — space_r'",
+        "git remote add origin https://github.com/YOUR_USERNAME/space_r.git",
+        "git branch -M main",
+        "git push -u origin main"
+      ]
+    }
+  },
+
+  "toster": {
+    "status": "done",
+    "summary": "10 проверок, покрытие всех 15 требований. 100% coverage. Приоритет: игры + роутинг + сборка.",
+    "coverage_matrix": [
+      { "req": "R01", "tasks": ["T02"], "checks": ["QA01"] },
+      { "req": "R02", "tasks": ["T01"], "checks": ["QA02", "QA03"] },
+      { "req": "R03", "tasks": ["T05"], "checks": ["QA04"] },
+      { "req": "R04", "tasks": ["T06"], "checks": ["QA05"] },
+      { "req": "R05", "tasks": ["T07"], "checks": ["QA06"] },
+      { "req": "R06", "tasks": ["T08", "T09", "T10"], "checks": ["QA07"] },
+      { "req": "R07", "tasks": ["T07"], "checks": ["QA08"] },
+      { "req": "R08", "tasks": ["T11"], "checks": ["QA09"] },
+      { "req": "R09", "tasks": ["T12"], "checks": ["QA10"] },
+      { "req": "R10", "tasks": ["T03"], "checks": ["QA04"] },
+      { "req": "R11", "tasks": ["T13"], "checks": ["QA11"] },
+      { "req": "R12", "tasks": ["T03"], "checks": ["QA04"] },
+      { "req": "R13", "tasks": ["T03", "T04", "T05", "T06", "T07"], "checks": ["QA12"] },
+      { "req": "R14", "tasks": ["T14"], "checks": ["QA13"] },
+      { "req": "R15", "tasks": ["T14"], "checks": ["QA14"] }
+    ],
+    "checklist": [
+      { "id": "QA01", "action": "ls public/assets/images && ls public/assets/audio", "expected": "Файлы ассетов из форка присутствуют" },
+      { "id": "QA02", "action": "npm install && npm run dev", "expected": "Дев-сервер запускается, нет ошибок в консоли" },
+      { "id": "QA03", "action": "npm run build", "expected": "dist/ создан, нет ошибок сборки" },
+      { "id": "QA04", "action": "Открыть / в браузере", "expected": "Hero с анимацией, секции персонажей и игр видны, звёзды анимированы" },
+      { "id": "QA05", "action": "Перейти на /characters", "expected": "5 карточек персонажей с фото/emoji, статами, hover-эффектом" },
+      { "id": "QA06", "action": "Перейти на /games", "expected": "6 карточек игр с названиями и кнопкой Играть" },
+      { "id": "QA07", "action": "Открыть каждую из 6 игр (/games/tetris, /games/snake, etc.)", "expected": "Игра запускается, управление работает, game over корректен" },
+      { "id": "QA08", "action": "Перейти на /facts", "expected": "Показан факт 1/20, кнопки prev/next переключают, progress bar обновляется" },
+      { "id": "QA09", "action": "Перейти на /workshop, нарисовать линию, нажать ластик, очистить, сохранить", "expected": "Canvas работает, PNG скачивается" },
+      { "id": "QA10", "action": "Перейти на /quiz, ответить на 5 вопросов", "expected": "Правильные/неправильные считаются, финальный счёт отображается" },
+      { "id": "QA11", "action": "Нажать кнопку music player", "expected": "Музыка включается/выключается, кнопка меняет иконку" },
+      { "id": "QA12", "action": "DevTools: 375px, 768px, 1280px", "expected": "Navbar, карточки, игры — всё адаптировано без overflow" },
+      { "id": "QA13", "action": "Push в main → GitHub Actions", "expected": "Workflow успешен, сайт доступен на GitHub Pages" },
+      { "id": "QA14", "action": "Открыть README.md", "expected": "Описание проекта, команды запуска, скриншот или демо-ссылка" }
+    ],
+    "uncovered_requirements": []
+  },
+
+  "devops": {
+    "status": "done",
+    "summary": "GitHub Pages deploy через vite build + gh-pages ветка. Форк инструкция задокументирована в T14.",
+    "fork_instructions": [
+      "1. Форкнуть https://github.com/MMDyuzhev/Space_roblox на свой аккаунт",
+      "2. Клонировать форк локально",
+      "3. Скопировать папки images/ и audio/ в E:\\Politech\\space_r\\public\\assets\\",
+      "4. Создать новый репо space_r на GitHub",
+      "5. Инициализировать git в E:\\Politech\\space_r\\ и запушить"
+    ],
+    "github_actions_workflow": {
+      "trigger": "push to main",
+      "steps": ["checkout", "setup-node@v4 (node 20)", "npm ci", "npm run build", "deploy dist/ to gh-pages branch"],
+      "vite_base": "/space_r/"
+    },
+    "env_vars": "Нет — проект статический, без backend",
+    "estimated_build_time": "~45 секунд"
+  }
+}
