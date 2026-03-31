@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen py-20 px-4">
-    <div class="max-w-xl mx-auto">
+    <div class="w-full md:w-[62%] mx-auto">
       <RouterLink to="/games" class="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors">← Назад</RouterLink>
       <div class="text-center mb-6">
         <h1 class="font-display font-black text-4xl text-white mb-1">🏓 Понг</h1>
@@ -12,13 +12,23 @@
       </div>
 
       <div class="glass-card p-4 flex justify-center relative">
-        <canvas ref="canvasRef" width="400" height="450" class="rounded-lg" />
+        <canvas
+          ref="canvasRef"
+          :width="canvasWidth"
+          :height="canvasHeight"
+          class="rounded-lg w-full"
+          @touchmove.prevent="onTouchMove"
+        />
         <div v-if="!running" class="absolute inset-4 flex flex-col items-center justify-center bg-slate-950/80 rounded-lg text-center">
           <p v-if="message" class="text-white font-display font-bold text-xl mb-4">{{ message }}</p>
           <button @click="startGame" class="btn-primary">{{ playerScore + aiScore > 0 ? 'Снова' : 'Старт' }}</button>
         </div>
       </div>
-      <div class="glass-card p-3 mt-4 text-center text-slate-500 text-xs">W/S или стрелки — ракетка</div>
+
+      <div class="glass-card p-3 mt-4 text-center text-slate-500 text-xs">
+        <span class="hidden md:inline">W/S или стрелки ↑↓ — ракетка</span>
+        <span class="md:hidden">Тяни пальцем по игровому полю ↑↓</span>
+      </div>
     </div>
   </div>
 </template>
@@ -26,21 +36,24 @@
 <script setup>
 import { ref, onUnmounted } from 'vue'
 import { useGameStore } from '@/stores/useGameStore.js'
+import { useGameCanvas } from '@/composables/useGameCanvas.js'
 
 const gameStore = useGameStore()
 const canvasRef = ref(null)
+
+const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 1.1, minSize: 280, maxSize: 700 })
 
 const playerScore = ref(0)
 const aiScore = ref(0)
 const running = ref(false)
 const message = ref('')
 
-const W = 400, H = 450
 const PAD_W = 12, PAD_H = 70, BALL_R = 8
 
 let player, ai, ball, animId, keys
 
 function startBall(dir = 1) {
+  const W = canvasWidth.value, H = canvasHeight.value
   const angle = (Math.random() * 0.4 - 0.2)
   ball = {
     x: W/2, y: H/2,
@@ -50,6 +63,7 @@ function startBall(dir = 1) {
 }
 
 function startGame() {
+  const H = canvasHeight.value
   player = { y: H/2 - PAD_H/2 }
   ai = { y: H/2 - PAD_H/2 }
   playerScore.value = 0
@@ -63,6 +77,7 @@ function startGame() {
 
 function loop() {
   if (!running.value) return
+  const W = canvasWidth.value, H = canvasHeight.value
 
   const speed = 6
   if (keys['ArrowUp'] || keys['w']) player.y = Math.max(0, player.y - speed)
@@ -109,6 +124,7 @@ function loop() {
 function draw() {
   const ctx = canvasRef.value?.getContext('2d')
   if (!ctx) return
+  const W = canvasWidth.value, H = canvasHeight.value
 
   ctx.fillStyle = '#0f172a'
   ctx.fillRect(0, 0, W, H)
@@ -133,6 +149,15 @@ function draw() {
   ctx.fillText(playerScore.value, W/4 - 15, 60)
   ctx.fillStyle = '#f43f5e80'
   ctx.fillText(aiScore.value, 3*W/4 - 15, 60)
+}
+
+// Touch drag
+function onTouchMove(e) {
+  if (!running.value) return
+  const rect = canvasRef.value.getBoundingClientRect()
+  const touchY = e.touches[0].clientY - rect.top
+  const scale = canvasHeight.value / rect.height
+  player.y = Math.max(0, Math.min(canvasHeight.value - PAD_H, touchY * scale - PAD_H / 2))
 }
 
 function onKey(e) { keys[e.key] = e.type === 'keydown' }

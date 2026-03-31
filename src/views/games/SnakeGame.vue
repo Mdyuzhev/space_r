@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen py-20 px-4">
-    <div class="max-w-xl mx-auto">
+    <div class="w-full md:w-[62%] mx-auto">
       <RouterLink to="/games" class="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors">← Назад</RouterLink>
 
       <div class="text-center mb-6">
@@ -12,15 +12,25 @@
       </div>
 
       <div class="glass-card p-4 flex justify-center relative">
-        <canvas ref="canvasRef" :width="COLS * CELL" :height="ROWS * CELL" class="rounded-lg" />
+        <canvas
+          ref="canvasRef"
+          :width="canvasWidth"
+          :height="canvasHeight"
+          class="rounded-lg w-full"
+          @touchstart="onSwipeStart"
+          @touchend.prevent="onSwipeEnd"
+        />
         <div v-if="!running" class="absolute inset-4 flex flex-col items-center justify-center bg-slate-950/80 rounded-lg">
           <p v-if="gameOver" class="text-rose-400 font-display font-bold text-2xl mb-4">Конец!</p>
           <button @click="startGame" class="btn-primary">{{ gameOver ? 'Снова' : 'Старт' }}</button>
         </div>
       </div>
 
+      <GameDpad layout="arrows" @press="onDpadPress" />
+
       <div class="glass-card p-3 mt-4 text-center text-slate-500 text-xs">
-        WASD / стрелки — управление · Змейка проходит сквозь стены
+        <span class="hidden md:inline">WASD / стрелки — управление · Змейка проходит сквозь стены</span>
+        <span class="md:hidden">Свайп или D-pad для управления</span>
       </div>
     </div>
   </div>
@@ -29,11 +39,16 @@
 <script setup>
 import { ref, onUnmounted } from 'vue'
 import { useGameStore } from '@/stores/useGameStore.js'
+import { useGameCanvas } from '@/composables/useGameCanvas.js'
+import GameDpad from '@/components/GameDpad.vue'
 
 const gameStore = useGameStore()
 const canvasRef = ref(null)
-const COLS = 20, ROWS = 20, CELL = 20
+const COLS = 20, ROWS = 20
+let CELL = 20
 const SPEED = 120
+
+const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 1, minSize: 280, maxSize: 600 })
 
 const score = ref(0)
 const running = ref(false)
@@ -44,6 +59,7 @@ let snake, dir, food, animId, lastStep
 function wrap(v, max) { return ((v % max) + max) % max }
 
 function startGame() {
+  CELL = Math.floor(canvasWidth.value / COLS)
   snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }]
   dir = { x: 1, y: 0 }
   score.value = 0
@@ -79,8 +95,11 @@ function step() {
 function draw() {
   const ctx = canvasRef.value?.getContext('2d')
   if (!ctx) return
+  CELL = Math.floor(canvasWidth.value / COLS)
+  const W = COLS * CELL, H = ROWS * CELL
+
   ctx.fillStyle = '#0f172a'
-  ctx.fillRect(0, 0, COLS * CELL, ROWS * CELL)
+  ctx.fillRect(0, 0, W, H)
 
   ctx.strokeStyle = '#1e293b40'
   ctx.lineWidth = 0.5
@@ -116,16 +135,43 @@ function loop(ts) {
   animId = requestAnimationFrame(loop)
 }
 
+// Keyboard
 const KEY_MAP = {
   ArrowLeft:  { x: -1, y:  0 }, a: { x: -1, y:  0 },
   ArrowRight: { x:  1, y:  0 }, d: { x:  1, y:  0 },
   ArrowUp:    { x:  0, y: -1 }, w: { x:  0, y: -1 },
   ArrowDown:  { x:  0, y:  1 }, s: { x:  0, y:  1 },
 }
-
 function onKey(e) {
   const d = KEY_MAP[e.key]
   if (d && !(d.x === -dir.x && d.y === -dir.y)) dir = d
+}
+
+// D-pad
+function onDpadPress(btn) {
+  const map = { up: {x:0,y:-1}, down: {x:0,y:1}, left: {x:-1,y:0}, right: {x:1,y:0} }
+  const d = map[btn]
+  if (d && !(d.x === -dir.x && d.y === -dir.y)) dir = d
+}
+
+// Swipe
+let swipeStartX = 0, swipeStartY = 0
+function onSwipeStart(e) {
+  swipeStartX = e.touches[0].clientX
+  swipeStartY = e.touches[0].clientY
+}
+function onSwipeEnd(e) {
+  if (!running.value) return
+  const dx = e.changedTouches[0].clientX - swipeStartX
+  const dy = e.changedTouches[0].clientY - swipeStartY
+  if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return
+  if (Math.abs(dx) > Math.abs(dy)) {
+    const newDir = dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 }
+    if (!(newDir.x === -dir.x && newDir.y === -dir.y)) dir = newDir
+  } else {
+    const newDir = dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 }
+    if (!(newDir.x === -dir.x && newDir.y === -dir.y)) dir = newDir
+  }
 }
 
 window.addEventListener('keydown', onKey)

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen py-20 px-4">
-    <div class="max-w-xl mx-auto">
+    <div class="w-full md:w-[62%] mx-auto">
       <RouterLink to="/games" class="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors">← Назад</RouterLink>
       <div class="text-center mb-6">
         <h1 class="font-display font-black text-4xl text-white mb-1">🚀 Космическое Уклонение</h1>
@@ -16,7 +16,7 @@
         @mousemove="onMouseMove"
         @touchmove.prevent="onTouch"
       >
-        <canvas ref="canvasRef" width="400" height="500" class="rounded-lg cursor-none" />
+        <canvas ref="canvasRef" :width="canvasWidth" :height="canvasHeight" class="rounded-lg w-full cursor-none" />
         <div v-if="!running" class="absolute inset-4 flex flex-col items-center justify-center bg-slate-950/80 rounded-lg text-center">
           <div v-if="gameOver" class="mb-4">
             <p class="text-rose-400 font-display font-bold text-2xl mb-1">Метеорит!</p>
@@ -25,7 +25,10 @@
           <button @click="startGame" class="btn-primary">{{ gameOver ? 'Снова' : 'Старт' }}</button>
         </div>
       </div>
-      <div class="glass-card p-3 mt-4 text-center text-slate-500 text-xs">Двигай мышкой или пальцем</div>
+      <div class="glass-card p-3 mt-4 text-center text-slate-500 text-xs">
+        <span class="hidden md:inline">Двигай мышкой</span>
+        <span class="md:hidden">Двигай пальцем</span>
+      </div>
     </div>
   </div>
 </template>
@@ -33,19 +36,22 @@
 <script setup>
 import { ref, onUnmounted } from 'vue'
 import { useGameStore } from '@/stores/useGameStore.js'
+import { useGameCanvas } from '@/composables/useGameCanvas.js'
 
 const gameStore = useGameStore()
 const canvasRef = ref(null)
+
+const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 1.25, minSize: 280, maxSize: 700 })
 
 const time = ref(0)
 const combo = ref(1)
 const running = ref(false)
 const gameOver = ref(false)
 
-const W = 400, H = 500
 let ship, meteors, animId, lastTime, frames, targetX, targetY
 
 function startGame() {
+  const W = canvasWidth.value, H = canvasHeight.value
   ship = { x: W/2, y: H - 60, r: 18 }
   meteors = []
   frames = 0
@@ -59,6 +65,7 @@ function startGame() {
 }
 
 function spawnMeteor() {
+  const W = canvasWidth.value
   meteors.push({
     x: Math.random() * W,
     y: -20,
@@ -71,6 +78,7 @@ function spawnMeteor() {
 
 function loop(ts) {
   if (!running.value) return
+  const W = canvasWidth.value, H = canvasHeight.value
   frames++
 
   ship.x += (targetX - ship.x) * 0.15
@@ -106,6 +114,7 @@ function loop(ts) {
 function draw() {
   const ctx = canvasRef.value?.getContext('2d')
   if (!ctx) return
+  const W = canvasWidth.value, H = canvasHeight.value
 
   ctx.fillStyle = '#020617'
   ctx.fillRect(0, 0, W, H)
@@ -164,15 +173,19 @@ function draw() {
 function onMouseMove(e) {
   const rect = canvasRef.value?.getBoundingClientRect()
   if (!rect) return
-  targetX = e.clientX - rect.left
-  targetY = e.clientY - rect.top
+  const scaleX = canvasWidth.value / rect.width
+  const scaleY = canvasHeight.value / rect.height
+  targetX = (e.clientX - rect.left) * scaleX
+  targetY = (e.clientY - rect.top) * scaleY
 }
 
 function onTouch(e) {
   const rect = canvasRef.value?.getBoundingClientRect()
   if (!rect) return
-  targetX = e.touches[0].clientX - rect.left
-  targetY = e.touches[0].clientY - rect.top
+  const scaleX = canvasWidth.value / rect.width
+  const scaleY = canvasHeight.value / rect.height
+  targetX = (e.touches[0].clientX - rect.left) * scaleX
+  targetY = (e.touches[0].clientY - rect.top) * scaleY
 }
 
 onUnmounted(() => cancelAnimationFrame(animId))

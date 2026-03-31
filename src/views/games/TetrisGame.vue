@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen py-20 px-4">
-    <div class="max-w-xl mx-auto">
+    <div class="w-full md:w-[62%] mx-auto">
       <RouterLink to="/games" class="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors">← Назад</RouterLink>
 
       <div class="text-center mb-6">
@@ -13,7 +13,14 @@
       </div>
 
       <div class="glass-card p-4 flex justify-center relative">
-        <canvas ref="canvasRef" :width="COLS * CELL" :height="ROWS * CELL" class="rounded-lg" />
+        <canvas
+          ref="canvasRef"
+          :width="canvasWidth"
+          :height="canvasHeight"
+          class="rounded-lg w-full"
+          @touchstart="onTouchStart"
+          @touchend.prevent="onTouchEnd"
+        />
         <div v-if="!running" class="absolute inset-4 flex flex-col items-center justify-center bg-slate-950/80 rounded-lg">
           <div v-if="gameOver" class="text-center mb-6">
             <p class="text-rose-400 font-display font-bold text-2xl mb-2">Игра окончена!</p>
@@ -25,8 +32,11 @@
         </div>
       </div>
 
+      <GameDpad layout="arrows" @press="onDpadPress" />
+
       <div class="glass-card p-3 mt-4 text-center text-slate-500 text-xs">
-        ← → двигать · ↑ повернуть · ↓ ускорить · Пробел — сброс на дно
+        <span class="hidden md:inline">← → двигать · ↑ повернуть · ↓ ускорить · Пробел — сброс на дно</span>
+        <span class="md:hidden">Свайп или D-pad для управления</span>
       </div>
     </div>
   </div>
@@ -35,13 +45,17 @@
 <script setup>
 import { ref, onUnmounted } from 'vue'
 import { useGameStore } from '@/stores/useGameStore.js'
+import { useGameCanvas } from '@/composables/useGameCanvas.js'
+import GameDpad from '@/components/GameDpad.vue'
 
 const gameStore = useGameStore()
 const canvasRef = ref(null)
 
 const COLS = 10
 const ROWS = 20
-const CELL = 30
+let CELL = 30
+
+const { canvasWidth, canvasHeight } = useGameCanvas({ aspectRatio: 2, minSize: 280, maxSize: 500 })
 
 const score = ref(0)
 const level = ref(1)
@@ -130,6 +144,7 @@ function draw() {
   const canvas = canvasRef.value
   if (!canvas) return
   const ctx = canvas.getContext('2d')
+  CELL = Math.floor(canvasWidth.value / COLS)
 
   ctx.fillStyle = '#0f172a'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
@@ -144,11 +159,10 @@ function draw() {
 
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      if (board[r][c]) drawCell(ctx, r, c, board[r][c])
+      if (board[r][c]) drawCellFn(ctx, r, c, board[r][c])
     }
   }
 
-  // Ghost piece
   const ghost = { cells: piece.cells.map(c => [...c]) }
   while (true) {
     const moved = ghost.cells.map(([r, c]) => [r + 1, c])
@@ -161,10 +175,10 @@ function draw() {
     ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
   })
 
-  piece.cells.forEach(([r, c]) => drawCell(ctx, r, c, piece.color))
+  piece.cells.forEach(([r, c]) => drawCellFn(ctx, r, c, piece.color))
 }
 
-function drawCell(ctx, r, c, color) {
+function drawCellFn(ctx, r, c, color) {
   ctx.fillStyle = color
   ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
   ctx.fillStyle = 'rgba(255,255,255,0.2)'
@@ -183,6 +197,7 @@ function gameLoop(ts) {
 }
 
 function startGame() {
+  CELL = Math.floor(canvasWidth.value / COLS)
   board = emptyBoard()
   score.value = 0
   level.value = 1
@@ -200,6 +215,7 @@ function endGame() {
   cancelAnimationFrame(animId)
 }
 
+// Keyboard
 function onKey(e) {
   if (!running.value) return
   if (e.key === 'ArrowLeft')  move(0, -1)
@@ -207,6 +223,37 @@ function onKey(e) {
   if (e.key === 'ArrowDown')  move(1, 0)
   if (e.key === 'ArrowUp')    rotatePiece()
   if (e.key === ' ')          { e.preventDefault(); hardDrop() }
+}
+
+// D-pad
+function onDpadPress(btn) {
+  if (!running.value) return
+  if (btn === 'left')   move(0, -1)
+  if (btn === 'right')  move(0,  1)
+  if (btn === 'down')   move(1,  0)
+  if (btn === 'up')     move(1,  0)
+  if (btn === 'rotate') rotatePiece()
+}
+
+// Swipe
+let touchStartX = 0, touchStartY = 0
+function onTouchStart(e) {
+  touchStartX = e.touches[0].clientX
+  touchStartY = e.touches[0].clientY
+}
+function onTouchEnd(e) {
+  if (!running.value) return
+  const dx = e.changedTouches[0].clientX - touchStartX
+  const dy = e.changedTouches[0].clientY - touchStartY
+  const absDx = Math.abs(dx), absDy = Math.abs(dy)
+
+  if (absDx < 10 && absDy < 10) { rotatePiece(); return }
+
+  if (absDx > absDy) {
+    move(0, dx > 0 ? 1 : -1)
+  } else {
+    if (dy > 0) hardDrop()
+  }
 }
 
 window.addEventListener('keydown', onKey)

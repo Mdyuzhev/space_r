@@ -17,7 +17,10 @@
 
       <p class="text-slate-400 text-sm text-center mb-4">{{ game.description }}</p>
 
-      <p class="text-slate-600 text-xs text-center mb-4">{{ game.controls }}</p>
+      <p class="text-slate-600 text-xs text-center mb-4">
+        <span class="hidden md:inline">{{ game.controls }}</span>
+        <span class="md:hidden">Touch-управление</span>
+      </p>
 
       <div
         class="w-full py-2 rounded-xl text-center text-sm font-semibold transition-all duration-200"

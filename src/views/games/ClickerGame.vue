@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen py-20 px-4">
-    <div class="max-w-2xl mx-auto">
+    <div class="w-full md:w-[62%] mx-auto">
       <RouterLink to="/games" class="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors">← Назад</RouterLink>
 
       <div class="text-center mb-6">
@@ -17,7 +17,7 @@
 
           <button
             @click="click"
-            class="text-8xl transition-transform duration-75 hover:scale-110 active:scale-95 select-none cursor-pointer"
+            class="text-7xl md:text-8xl transition-transform duration-75 hover:scale-110 active:scale-95 select-none cursor-pointer py-4"
             style="filter: drop-shadow(0 0 20px #6366f180)"
           >
             🚀
